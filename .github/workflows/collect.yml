@@ -27,9 +27,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Playwright 브라우저 설치
-        run: |
-          playwright install chromium
-          sudo playwright install-deps chromium
+        run: python -m playwright install --with-deps chromium
 
       - name: 쿠키 복원
         run: |

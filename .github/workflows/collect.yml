@@ -1,0 +1,45 @@
+name: 샤오훙슈 일일 데이터 수집
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 매일 오전 9시 (한국 시간 = UTC 00:00)
+  workflow_dispatch:        # 수동 실행 버튼
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 패키지 설치
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium --with-deps
+
+      - name: 쿠키 복원
+        run: |
+          mkdir -p data
+          echo '${{ secrets.XHS_COOKIES }}' > data/cookies.json
+
+      - name: 데이터 수집 실행
+        run: python main.py --run-now
+
+      - name: 데이터 커밋 & 푸시
+        run: |
+          git config user.name "xhs-bot"
+          git config user.email "bot@github.com"
+          git add data/xhs_stats.db
+          git diff --staged --quiet || git commit -m "데이터 업데이트 $(date '+%Y-%m-%d %H:%M KST')"
+          git push

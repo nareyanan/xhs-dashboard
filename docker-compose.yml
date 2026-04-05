@@ -1,0 +1,19 @@
+services:
+  xhs-app:
+    build: .
+    container_name: xhs-app
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data   # DB + 쿠키 영속화
+    environment:
+      - TZ=Asia/Seoul
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/healthz"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

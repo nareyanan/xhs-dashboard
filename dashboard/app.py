@@ -1,6 +1,10 @@
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Streamlit Cloud / 로컬 양쪽에서 경로가 올바르게 잡히도록
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _ROOT)
+os.chdir(_ROOT)  # 작업 디렉토리를 프로젝트 루트로 고정
 
 import streamlit as st
 import pandas as pd

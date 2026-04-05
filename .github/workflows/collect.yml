@@ -24,7 +24,7 @@ jobs:
           cache: 'pip'
 
       - name: 패키지 설치
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-scraper.txt
 
       - name: Playwright 브라우저 설치
         run: python -m playwright install --with-deps chromium

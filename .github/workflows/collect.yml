@@ -30,9 +30,11 @@ jobs:
         run: python -m playwright install --with-deps chromium
 
       - name: 쿠키 복원
+        env:
+          XHS_COOKIES: ${{ secrets.XHS_COOKIES }}
         run: |
           mkdir -p data
-          echo '${{ secrets.XHS_COOKIES }}' > data/cookies.json
+          python -c "import os, json; c=json.loads(os.environ['XHS_COOKIES']); open('data/cookies.json','w').write(json.dumps(c))"
 
       - name: 데이터 수집 실행
         run: python main.py --run-now

@@ -32,11 +32,19 @@ def run_now():
     init_db()
 
     async def _collect():
+        # 쿠키 파일 존재 여부로 로그인 확인 (브라우저 체크는 geo-block 위험)
+        import json
+        from config import COOKIES_FILE
+        from pathlib import Path
+        if not Path(COOKIES_FILE).exists():
+            logger.error("쿠키 파일 없음! setup_login.py를 먼저 실행하세요.")
+            sys.exit(1)
+        cookies = json.loads(Path(COOKIES_FILE).read_text())
+        if not any(c.get("name") == "web_session" for c in cookies):
+            logger.error("로그인 세션 없음! setup_login.py를 다시 실행하세요.")
+            sys.exit(1)
+        logger.info("쿠키 확인 완료, 수집 시작...")
         async with XHSBrowser(headless=True) as xhs:
-            logged_in = await xhs.is_logged_in()
-            if not logged_in:
-                logger.error("로그인 세션 만료! 먼저 setup_login.py를 실행하세요.")
-                sys.exit(1)
             collected = await run_daily_collection(xhs.page)
             save_daily_stats(collected)
             logger.info("수집 완료!")
